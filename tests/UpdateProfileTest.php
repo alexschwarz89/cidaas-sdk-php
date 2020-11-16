@@ -6,8 +6,6 @@ use Cidaas\OAuth2\Client\Provider\AbstractCidaasTestParent;
 use Cidaas\OAuth2\Client\Provider\GrantType;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Response;
-use function PHPUnit\Framework\assertEquals;
-use function PHPUnit\Framework\assertTrue;
 
 final class UpdateProfileTest extends AbstractCidaasTestParent {
     private static $getAccessTokenInvalidResponse = '{"error":"Access denied for this resource","refnumber":"1603218944318-f1508e83-e50b-477a-af32-747e03d5f1a6"}';
@@ -39,11 +37,11 @@ final class UpdateProfileTest extends AbstractCidaasTestParent {
         })->wait();
 
         $request = $this->mock->getLastRequest();
-        assertEquals('PUT', $request->getMethod());
-        assertEquals('/users-srv/user/profile/' . self::$SUB, $request->getUri()->getPath());
-        assertEquals('Bearer ' . self::$ACCESS_TOKEN, $request->getHeader('Authorization')[0]);
+        self::assertEquals('PUT', $request->getMethod());
+        self::assertEquals('/users-srv/user/profile/' . self::$SUB, $request->getUri()->getPath());
+        self::assertEquals('Bearer ' . self::$ACCESS_TOKEN, $request->getHeader('Authorization')[0]);
         $parsedBody = json_decode($request->getBody(), true);
-        assertEquals('changed_given_name', $parsedBody['given_name']);
+        self::assertEquals('changed_given_name', $parsedBody['given_name']);
     }
 
     public function test_updateProfile_withSubFieldsAndAccessToken_returnedResultFromServer() {
@@ -57,9 +55,9 @@ final class UpdateProfileTest extends AbstractCidaasTestParent {
             ], $accessToken);
         })->wait();
 
-        assertEquals(200, $response['status']);
-        assertTrue($response['success']);
-        assertTrue($response['data']['updated']);
+        self::assertEquals(200, $response['status']);
+        self::assertTrue($response['success']);
+        self::assertTrue($response['data']['updated']);
     }
 
     public function TODO_test_updateProfile_withUnchangeableField_returnedError() {
@@ -78,9 +76,9 @@ final class UpdateProfileTest extends AbstractCidaasTestParent {
             $promise->wait();
             self::fail('Promise should return exception');
         } catch (ClientException $exception) {
-            assertEquals(401, $exception->getCode());
+            self::assertEquals(401, $exception->getCode());
             $response = json_decode($exception->getResponse()->getBody(), true);
-            assertEquals('Access denied for this resource', $response['error']);
+            self::assertEquals('Access denied for this resource', $response['error']);
         }
     }
 
@@ -97,9 +95,9 @@ final class UpdateProfileTest extends AbstractCidaasTestParent {
             $promise->wait();
             self::fail('Promise should return exception');
         } catch (ClientException $exception) {
-            assertEquals(401, $exception->getCode());
+            self::assertEquals(401, $exception->getCode());
             $response = json_decode($exception->getResponse()->getBody(), true);
-            assertEquals('Access denied for this resource', $response['error']);
+            self::assertEquals('Access denied for this resource', $response['error']);
         }
     }
 }

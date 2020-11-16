@@ -6,9 +6,6 @@ use Cidaas\OAuth2\Client\Provider\AbstractCidaasTestParent;
 use Cidaas\OAuth2\Client\Provider\GrantType;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Response;
-use function PHPUnit\Framework\assertEquals;
-use function PHPUnit\Framework\assertFalse;
-use function PHPUnit\Framework\assertTrue;
 
 final class ValidateAccessTokenTest extends AbstractCidaasTestParent {
     private static $validAccessTokenResponse = '{"active":true,"token_type":"Bearer","aud":"7d5abdbc-8186-4c82-9943-f71506aaf700","exp":1603449786,"iat":1603363386,"iss":"https://nightlybuild.cidaas.de","jti":"11aa3792-5309-49a8-b405-aac64f36ce0b","roles":["USER"],"scopes":["openid"],"sub":"df838cf7-dc95-44de-a1cc-5c0eafb0f6db","scope":"openid"}';
@@ -51,12 +48,12 @@ final class ValidateAccessTokenTest extends AbstractCidaasTestParent {
         })->wait();
 
         $request = $this->mock->getLastRequest();
-        assertEquals('POST', $request->getMethod());
-        assertEquals('/token-srv/introspect', $request->getUri()->getPath());
-        assertEquals('Bearer ' . $this->accessTokenForApiAccess, $request->getHeader('Authorization')[0]);
+        self::assertEquals('POST', $request->getMethod());
+        self::assertEquals('/token-srv/introspect', $request->getUri()->getPath());
+        self::assertEquals('Bearer ' . $this->accessTokenForApiAccess, $request->getHeader('Authorization')[0]);
         $parsedBody = json_decode($request->getBody(), true);
-        assertEquals('access_token', $parsedBody['token_type_hint']);
-        assertEquals($this->accessTokenToValidate, $parsedBody['token']);
+        self::assertEquals('access_token', $parsedBody['token_type_hint']);
+        self::assertEquals($this->accessTokenToValidate, $parsedBody['token']);
     }
 
     public function test_validateAccessToken_withAccessTokenToValidateAndNoAccessTokenForApiAccesss_serverCalledWithAccessTokenAndBasicAuthentication() {
@@ -70,12 +67,12 @@ final class ValidateAccessTokenTest extends AbstractCidaasTestParent {
         $this->provider->validateAccessToken($this->accessTokenToValidate)->wait();
 
         $request = $this->mock->getLastRequest();
-        assertEquals('POST', $request->getMethod());
-        assertEquals('/token-srv/introspect', $request->getUri()->getPath());
-        assertEquals('Basic ' . base64_encode($_ENV['CIDAAS_CLIENT_ID'] . ":" . $_ENV['CIDAAS_CLIENT_SECRET']), $request->getHeader('Authorization')[0]);
+        self::assertEquals('POST', $request->getMethod());
+        self::assertEquals('/token-srv/introspect', $request->getUri()->getPath());
+        self::assertEquals('Basic ' . base64_encode($_ENV['CIDAAS_CLIENT_ID'] . ":" . $_ENV['CIDAAS_CLIENT_SECRET']), $request->getHeader('Authorization')[0]);
         $parsedBody = json_decode($request->getBody(), true);
-        assertEquals('access_token', $parsedBody['token_type_hint']);
-        assertEquals($this->accessTokenToValidate, $parsedBody['token']);
+        self::assertEquals('access_token', $parsedBody['token_type_hint']);
+        self::assertEquals($this->accessTokenToValidate, $parsedBody['token']);
     }
 
     public function test_validateAccessToken_withAccessTokenToValidateAndAccessTokenForApiAccesss_returnsResponseFromServer() {
@@ -97,7 +94,7 @@ final class ValidateAccessTokenTest extends AbstractCidaasTestParent {
         });
 
         $response = $responsePromise->wait();
-        assertTrue($response['active']);
+        self::assertTrue($response['active']);
     }
 
     public function test_validateAccessToken_withInvalidAccessTokenToValidateAndAccessTokenForApiAccesss_returnsResponseFromServer() {
@@ -119,7 +116,7 @@ final class ValidateAccessTokenTest extends AbstractCidaasTestParent {
         });
 
         $response = $responsePromise->wait();
-        assertFalse($response['active']);
+        self::assertFalse($response['active']);
     }
 
     public function test_validateAccessToken_withAccessTokenToValidateAndInvalidAccessTokenForApiAccesss_returnsResponseFromServer() {
@@ -144,9 +141,9 @@ final class ValidateAccessTokenTest extends AbstractCidaasTestParent {
             $responsePromise->wait();
             self::fail('promise should throw an exception');
         } catch (ClientException $exception) {
-            assertEquals(400, $exception->getCode());
+            self::assertEquals(400, $exception->getCode());
             $response = json_decode($exception->getResponse()->getBody(), true);
-            assertEquals('invalid_request', $response['error']);
+            self::assertEquals('invalid_request', $response['error']);
         }
     }
 }

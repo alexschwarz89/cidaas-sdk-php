@@ -5,9 +5,6 @@ require_once __DIR__ . '/AbstractCidaasTestParent.php';
 use Cidaas\OAuth2\Client\Provider\AbstractCidaasTestParent;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Response;
-use function PHPUnit\Framework\assertFalse;
-use function PHPUnit\Framework\assertEquals;
-use function PHPUnit\Framework\assertTrue;
 
 final class PerformResetPasswordTest extends AbstractCidaasTestParent {
     private static $PASSWORD = 'newPassword';
@@ -35,12 +32,12 @@ final class PerformResetPasswordTest extends AbstractCidaasTestParent {
         })->wait();
 
         $request = $this->mock->getLastRequest();
-        assertEquals('/users-srv/resetpassword/accept', $request->getUri()->getPath());
+        self::assertEquals('/users-srv/resetpassword/accept', $request->getUri()->getPath());
         $body = json_decode($request->getBody(), true);
-        assertEquals(self::$PASSWORD, $body['password']);
-        assertEquals(self::$CONFIRM_MATCHING_PASSWORD, $body['confirmPassword']);
-        assertEquals(self::$EXCHANGE_ID, $body['exchangeId']);
-        assertEquals(self::$RESET_REQUEST_ID, $body['resetRequestId']);
+        self::assertEquals(self::$PASSWORD, $body['password']);
+        self::assertEquals(self::$CONFIRM_MATCHING_PASSWORD, $body['confirmPassword']);
+        self::assertEquals(self::$EXCHANGE_ID, $body['exchangeId']);
+        self::assertEquals(self::$RESET_REQUEST_ID, $body['resetRequestId']);
     }
 
     public function test_handleResetPassword_withValidPasswordsExchangeIdAndRequestId_returnsSuccessResultFromServer() {
@@ -50,9 +47,9 @@ final class PerformResetPasswordTest extends AbstractCidaasTestParent {
             return $this->provider->resetPassword(self::$PASSWORD, self::$CONFIRM_MATCHING_PASSWORD, self::$EXCHANGE_ID, self::$RESET_REQUEST_ID);
         })->wait();
 
-        assertTrue($response['success']);
-        assertEquals(200, $response['status']);
-        assertTrue($response['data']['reseted']);
+        self::assertTrue($response['success']);
+        self::assertEquals(200, $response['status']);
+        self::assertTrue($response['data']['reseted']);
     }
 
 
@@ -67,11 +64,11 @@ final class PerformResetPasswordTest extends AbstractCidaasTestParent {
             $promise->wait();
             self::fail('Promise should return exception');
         } catch (ClientException $exception) {
-            assertEquals(417, $exception->getCode());
+            self::assertEquals(417, $exception->getCode());
             $response = json_decode($exception->getResponse()->getBody(), true);
-            assertFalse($response['success']);
-            assertEquals(417, $response['status']);
-            assertEquals(10009, $response['error']['code']);
+            self::assertFalse($response['success']);
+            self::assertEquals(417, $response['status']);
+            self::assertEquals(10009, $response['error']['code']);
         }
     }
 
@@ -86,11 +83,11 @@ final class PerformResetPasswordTest extends AbstractCidaasTestParent {
             $promise->wait();
             self::fail('Promise should return exception');
         } catch (ClientException $exception) {
-            assertEquals(400, $exception->getCode());
+            self::assertEquals(400, $exception->getCode());
             $response = json_decode($exception->getResponse()->getBody(), true);
-            assertFalse($response['success']);
-            assertEquals(400, $response['status']);
-            assertEquals(10002, $response['error']['code']);
+            self::assertFalse($response['success']);
+            self::assertEquals(400, $response['status']);
+            self::assertEquals(10002, $response['error']['code']);
         }
     }
 
@@ -105,11 +102,11 @@ final class PerformResetPasswordTest extends AbstractCidaasTestParent {
             $promise->wait();
             self::fail('Promise should return exception');
         } catch (ClientException $exception) {
-            assertEquals(400, $exception->getCode());
+            self::assertEquals(400, $exception->getCode());
             $response = json_decode($exception->getResponse()->getBody(), true);
-            assertFalse($response['success']);
-            assertEquals(400, $response['status']);
-            assertEquals(10002, $response['error']['code']);
+            self::assertFalse($response['success']);
+            self::assertEquals(400, $response['status']);
+            self::assertEquals(10002, $response['error']['code']);
         }
     }
 }

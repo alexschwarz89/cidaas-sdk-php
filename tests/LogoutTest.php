@@ -6,10 +6,6 @@ use Cidaas\OAuth2\Client\Provider\AbstractCidaasTestParent;
 use Cidaas\OAuth2\Client\Provider\GrantType;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Response;
-use function PHPUnit\Framework\assertStringContainsString;
-use function PHPUnit\Framework\assertStringNotContainsString;
-use function PHPUnit\Framework\assertEquals;
-use function PHPUnit\Framework\assertFalse;
 
 final class LogoutTest extends AbstractCidaasTestParent {
     private static $getAccessTokenInvalidResponse = '{"success":false,"status":400,"error":{"code":24007,"moreInfo":"","type":"LoginException","status":400,"referenceNumber":"1603275867825-5044e54b-9cd3-4dbc-9e61-fa33235bed87","error":"invalid token passed"}}';
@@ -39,10 +35,10 @@ final class LogoutTest extends AbstractCidaasTestParent {
         })->wait();
 
         $request = $this->mock->getLastRequest();
-        assertEquals('POST', $request->getMethod());
-        assertEquals('/session/end_session', $request->getUri()->getPath());
-        assertStringContainsString('access_token_hint=' . self::$ACCESS_TOKEN, $request->getUri()->getQuery());
-        assertStringContainsString('post_logout_redirect_uri=' . urlencode(self::$postLogoutUri), $request->getUri()->getQuery());
+        self::assertEquals('POST', $request->getMethod());
+        self::assertEquals('/session/end_session', $request->getUri()->getPath());
+        self::assertStringContainsString('access_token_hint=' . self::$ACCESS_TOKEN, $request->getUri()->getQuery());
+        self::assertStringContainsString('post_logout_redirect_uri=' . urlencode(self::$postLogoutUri), $request->getUri()->getQuery());
     }
 
     public function test_logout_withAccessTokenAndNoPostLogoutUri_serverCalledWithAccessToken() {
@@ -53,10 +49,10 @@ final class LogoutTest extends AbstractCidaasTestParent {
         })->wait();
 
         $request = $this->mock->getLastRequest();
-        assertEquals('POST', $request->getMethod());
-        assertEquals('/session/end_session', $request->getUri()->getPath());
-        assertStringContainsString('access_token_hint=' . self::$ACCESS_TOKEN, $request->getUri()->getQuery());
-        assertStringNotContainsString('post_logout_redirect_uri', $request->getUri()->getQuery());
+        self::assertEquals('POST', $request->getMethod());
+        self::assertEquals('/session/end_session', $request->getUri()->getPath());
+        self::assertStringContainsString('access_token_hint=' . self::$ACCESS_TOKEN, $request->getUri()->getQuery());
+        self::assertStringNotContainsString('post_logout_redirect_uri', $request->getUri()->getQuery());
     }
 
     public function test_logout_withAccessTokenAndPostLogoutUri_returnsRedirectResponse() {
@@ -66,8 +62,8 @@ final class LogoutTest extends AbstractCidaasTestParent {
             return $this->provider->logout($accessToken, self::$postLogoutUri);
         })->wait();
 
-        assertEquals(302, $response->getStatusCode());
-        assertEquals(self::$postLogoutUri, $response->getHeader('location')[0]);
+        self::assertEquals(302, $response->getStatusCode());
+        self::assertEquals(self::$postLogoutUri, $response->getHeader('location')[0]);
     }
 
     public function test_logout_withInvalidAccessToken_returnsErrorResult() {
@@ -81,11 +77,11 @@ final class LogoutTest extends AbstractCidaasTestParent {
             $promise->wait();
             self::fail('Promise should return exception');
         } catch (ClientException $exception) {
-            assertEquals(401, $exception->getCode());
+            self::assertEquals(401, $exception->getCode());
             $response = json_decode($exception->getResponse()->getBody(), true);
-            assertFalse($response['success']);
-            assertEquals(400, $response['status']);
-            assertEquals(24007, $response['error']['code']);
+            self::assertFalse($response['success']);
+            self::assertEquals(400, $response['status']);
+            self::assertEquals(24007, $response['error']['code']);
         }
     }
 }

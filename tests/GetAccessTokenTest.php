@@ -11,9 +11,6 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
-use function PHPUnit\Framework\assertArrayHasKey;
-use function PHPUnit\Framework\assertStringContainsString;
-use function PHPUnit\Framework\assertEquals;
 
 final class GetAccessTokenTest extends AbstractCidaasTestParent {
     private static $REFRESH_TOKEN2 = '3e457b00-00a5-4274-82ab-c1955aadb38d';
@@ -46,11 +43,11 @@ final class GetAccessTokenTest extends AbstractCidaasTestParent {
         $request = $this->mock->getLastRequest();
         $body = $request->getBody();
 
-        assertStringContainsString('client_id=' . urlencode($_ENV['CIDAAS_CLIENT_ID']), $body);
-        assertStringContainsString('client_secret=' . urlencode($_ENV['CIDAAS_CLIENT_SECRET']), $body);
-        assertStringContainsString('redirect_uri=' . urlencode($_ENV['CIDAAS_REDIRECT_URI']), $body);
-        assertStringContainsString('grant_type=' . urlencode(GrantType::AuthorizationCode), $body);
-        assertStringContainsString('code=' . urlencode(self::$CODE), $body);
+        self::assertStringContainsString('client_id=' . urlencode($_ENV['CIDAAS_CLIENT_ID']), $body);
+        self::assertStringContainsString('client_secret=' . urlencode($_ENV['CIDAAS_CLIENT_SECRET']), $body);
+        self::assertStringContainsString('redirect_uri=' . urlencode($_ENV['CIDAAS_REDIRECT_URI']), $body);
+        self::assertStringContainsString('grant_type=' . urlencode(GrantType::AuthorizationCode), $body);
+        self::assertStringContainsString('code=' . urlencode(self::$CODE), $body);
     }
 
     public function test_getAccessToken_withGrantTypeRefreshTokenAndRefreshToken_serverCalledWithClientIdSecretAndToken() {
@@ -67,10 +64,10 @@ final class GetAccessTokenTest extends AbstractCidaasTestParent {
         $request = $this->mock->getLastRequest();
         $body = $request->getBody();
 
-        assertStringContainsString('client_id=' . urlencode($_ENV['CIDAAS_CLIENT_ID']), $body);
-        assertStringContainsString('client_secret=' . urlencode($_ENV['CIDAAS_CLIENT_SECRET']), $body);
-        assertStringContainsString('grant_type=' . urlencode(GrantType::RefreshToken), $body);
-        assertStringContainsString('refresh_token=' . urlencode(self::$REFRESH_TOKEN), $body);
+        self::assertStringContainsString('client_id=' . urlencode($_ENV['CIDAAS_CLIENT_ID']), $body);
+        self::assertStringContainsString('client_secret=' . urlencode($_ENV['CIDAAS_CLIENT_SECRET']), $body);
+        self::assertStringContainsString('grant_type=' . urlencode(GrantType::RefreshToken), $body);
+        self::assertStringContainsString('refresh_token=' . urlencode(self::$REFRESH_TOKEN), $body);
     }
 
     public function test_getAccessToken_withGrantTypeRefreshTokenAndRefreshToken_returnsResultFromRefreshToken() {
@@ -84,8 +81,8 @@ final class GetAccessTokenTest extends AbstractCidaasTestParent {
             return $this->provider->getAccessToken(GrantType::RefreshToken, '', $refreshToken);
         })->wait();
 
-        assertArrayHasKey('access_token', $response);
-        assertEquals(self::$REFRESH_TOKEN2, $response['refresh_token']);
+        self::assertArrayHasKey('access_token', $response);
+        self::assertEquals(self::$REFRESH_TOKEN2, $response['refresh_token']);
     }
 
     public function test_getAccessToken_withGrantTypeClientCredentials_serverCalledWithClientIdAndSecret() {
@@ -99,9 +96,9 @@ final class GetAccessTokenTest extends AbstractCidaasTestParent {
         $request = $this->mock->getLastRequest();
         $body = $request->getBody();
 
-        assertStringContainsString('client_id=' . urlencode($_ENV['CIDAAS_CLIENT_ID']), $body);
-        assertStringContainsString('client_secret=' . urlencode($_ENV['CIDAAS_CLIENT_SECRET']), $body);
-        assertStringContainsString('grant_type=' . urlencode(GrantType::ClientCredentials), $body);
+        self::assertStringContainsString('client_id=' . urlencode($_ENV['CIDAAS_CLIENT_ID']), $body);
+        self::assertStringContainsString('client_secret=' . urlencode($_ENV['CIDAAS_CLIENT_SECRET']), $body);
+        self::assertStringContainsString('grant_type=' . urlencode(GrantType::ClientCredentials), $body);
     }
 
     public function test_getAccessToken_withGrantTypeAuthorizationCodeAndCode_returnsAccessToken() {
@@ -114,7 +111,7 @@ final class GetAccessTokenTest extends AbstractCidaasTestParent {
 
         $response = $promise->wait();
 
-        assertEquals(self::$ACCESS_TOKEN, $response['access_token']);
+        self::assertEquals(self::$ACCESS_TOKEN, $response['access_token']);
     }
 
     public function test_loginWithCredentials_withInvalidCredentialsAndKnownUsernameGiven_returnsLoginUnsuccessfulFromServer() {
@@ -129,9 +126,9 @@ final class GetAccessTokenTest extends AbstractCidaasTestParent {
             $promise->wait();
             self::fail('Promise should return exception');
         } catch (ClientException $exception) {
-            assertEquals(400, $exception->getCode());
+            self::assertEquals(400, $exception->getCode());
             $response = json_decode($exception->getResponse()->getBody(), true);
-            assertEquals('invalid_grant', $response['error']);
+            self::assertEquals('invalid_grant', $response['error']);
         }
     }
 
@@ -142,7 +139,7 @@ final class GetAccessTokenTest extends AbstractCidaasTestParent {
             $this->provider->getAccessToken(GrantType::AuthorizationCode);
             self::fail('getAccessToken should have thrown an InvalidArgumentException');
         } catch (InvalidArgumentException $exception) {
-            assertEquals('code must not be empty in authorization_code flow', $exception->getMessage());
+            self::assertEquals('code must not be empty in authorization_code flow', $exception->getMessage());
         }
     }
 
@@ -153,7 +150,7 @@ final class GetAccessTokenTest extends AbstractCidaasTestParent {
             $this->provider->getAccessToken(GrantType::RefreshToken);
             self::fail('getAccessToken should have thrown an InvalidArgumentException');
         } catch (InvalidArgumentException $exception) {
-            assertEquals('refreshToken must not be empty in refresh_token flow', $exception->getMessage());
+            self::assertEquals('refreshToken must not be empty in refresh_token flow', $exception->getMessage());
         }
     }
 
@@ -164,7 +161,7 @@ final class GetAccessTokenTest extends AbstractCidaasTestParent {
             $this->provider->getAccessToken('invalidGrantType');
             self::fail('getAccessToken should have thrown an InvalidArgumentException');
         } catch (InvalidArgumentException $exception) {
-            assertEquals('invalid grant type', $exception->getMessage());
+            self::assertEquals('invalid grant type', $exception->getMessage());
         }
     }
 }

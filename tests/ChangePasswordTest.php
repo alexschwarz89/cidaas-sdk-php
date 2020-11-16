@@ -6,9 +6,6 @@ use Cidaas\OAuth2\Client\Provider\AbstractCidaasTestParent;
 use Cidaas\OAuth2\Client\Provider\GrantType;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Response;
-use function PHPUnit\Framework\assertFalse;
-use function PHPUnit\Framework\assertEquals;
-use function PHPUnit\Framework\assertTrue;
 
 final class ChangePasswordTest extends AbstractCidaasTestParent {
     private static $getAccessTokenInvalidGrantResponse = '{"error":"Access denied for this resource","refnumber":"1603218944318-f1508e83-e50b-477a-af32-747e03d5f1a6"}';
@@ -47,13 +44,13 @@ final class ChangePasswordTest extends AbstractCidaasTestParent {
         })->wait();
 
         $request = $this->mock->getLastRequest();
-        assertEquals('/users-srv/changepassword', $request->getUri()->getPath());
-        assertEquals('Bearer ' . self::$ACCESS_TOKEN, $request->getHeader('Authorization')[0]);
+        self::assertEquals('/users-srv/changepassword', $request->getUri()->getPath());
+        self::assertEquals('Bearer ' . self::$ACCESS_TOKEN, $request->getHeader('Authorization')[0]);
         $parsedBody = json_decode($request->getBody(), true);
-        assertEquals(self::$OLD_PASSWORD, $parsedBody['old_password']);
-        assertEquals(self::$NEW_PASSWORD, $parsedBody['new_password']);
-        assertEquals(self::$CONFIRM_MATCHING_PASSWORD, $parsedBody['confirm_password']);
-        assertEquals(self::$IDENTITY_ID, $parsedBody['identityId']);
+        self::assertEquals(self::$OLD_PASSWORD, $parsedBody['old_password']);
+        self::assertEquals(self::$NEW_PASSWORD, $parsedBody['new_password']);
+        self::assertEquals(self::$CONFIRM_MATCHING_PASSWORD, $parsedBody['confirm_password']);
+        self::assertEquals(self::$IDENTITY_ID, $parsedBody['identityId']);
     }
 
     public function test_changePassword_withMatchingPasswords_returnsPasswordChangeSuccessful() {
@@ -65,9 +62,9 @@ final class ChangePasswordTest extends AbstractCidaasTestParent {
 
         $response = $promise->wait();
 
-        assertTrue($response['success']);
-        assertEquals(200, $response['status']);
-        assertTrue($response['data']['changed']);
+        self::assertTrue($response['success']);
+        self::assertEquals(200, $response['status']);
+        self::assertTrue($response['data']['changed']);
     }
 
     public function test_changePassword_withNonMatchingPasswords_returnsPasswordChangeError() {
@@ -81,11 +78,11 @@ final class ChangePasswordTest extends AbstractCidaasTestParent {
             $promise->wait();
             self::fail('Promise should return exception');
         } catch (ClientException $exception) {
-            assertEquals(417, $exception->getCode());
+            self::assertEquals(417, $exception->getCode());
             $response = json_decode($exception->getResponse()->getBody(), true);
-            assertFalse($response['success']);
-            assertEquals(417, $response['status']);
-            assertEquals(10009, $response['error']['code']);
+            self::assertFalse($response['success']);
+            self::assertEquals(417, $response['status']);
+            self::assertEquals(10009, $response['error']['code']);
         }
     }
 
@@ -100,11 +97,11 @@ final class ChangePasswordTest extends AbstractCidaasTestParent {
             $promise->wait();
             self::fail('Promise should return exception');
         } catch (ClientException $exception) {
-            assertEquals(400, $exception->getCode());
+            self::assertEquals(400, $exception->getCode());
             $response = json_decode($exception->getResponse()->getBody(), true);
-            assertFalse($response['success']);
-            assertEquals(400, $response['status']);
-            assertEquals(507, $response['error']['code']);
+            self::assertFalse($response['success']);
+            self::assertEquals(400, $response['status']);
+            self::assertEquals(507, $response['error']['code']);
         }
     }
 
@@ -120,11 +117,11 @@ final class ChangePasswordTest extends AbstractCidaasTestParent {
             $promise->wait();
             self::fail('Promise should return exception');
         } catch (ClientException $exception) {
-            assertEquals(417, $exception->getCode());
+            self::assertEquals(417, $exception->getCode());
             $response = json_decode($exception->getResponse()->getBody(), true);
-            assertFalse($response['success']);
-            assertEquals(417, $response['status']);
-            assertEquals(10009, $response['error']['code']);
+            self::assertFalse($response['success']);
+            self::assertEquals(417, $response['status']);
+            self::assertEquals(10009, $response['error']['code']);
         }
     }
 
@@ -139,9 +136,9 @@ final class ChangePasswordTest extends AbstractCidaasTestParent {
             $promise->wait();
             self::fail('Promise should return exception');
         } catch (ClientException $exception) {
-            assertEquals(401, $exception->getCode());
+            self::assertEquals(401, $exception->getCode());
             $response = json_decode($exception->getResponse()->getBody(), true);
-            assertEquals('Access denied for this resource', $response['error']);
+            self::assertEquals('Access denied for this resource', $response['error']);
         }
     }
 }

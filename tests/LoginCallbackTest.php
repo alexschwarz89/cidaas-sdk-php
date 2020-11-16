@@ -8,7 +8,6 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 use Cidaas\OAuth2\Client\Provider\Cidaas;
-use function PHPUnit\Framework\assertEquals;
 
 final class LoginCallbackTest extends TestCase {
     const PARAM_1_KEY = 'param1Key';
@@ -31,7 +30,7 @@ final class LoginCallbackTest extends TestCase {
 
         $parameters = $this->provider->loginCallback();
 
-        assertEquals(self::PARAM_1_VALUE, $parameters[self::PARAM_1_KEY]);
-        assertEquals(self::PARAM_2_VALUE, $parameters[self::PARAM_2_KEY]);
+        self::assertEquals(self::PARAM_1_VALUE, $parameters[self::PARAM_1_KEY]);
+        self::assertEquals(self::PARAM_2_VALUE, $parameters[self::PARAM_2_KEY]);
     }
 }

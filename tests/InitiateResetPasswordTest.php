@@ -5,10 +5,6 @@ require_once __DIR__ . '/AbstractCidaasTestParent.php';
 use Cidaas\OAuth2\Client\Provider\AbstractCidaasTestParent;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Response;
-use function PHPUnit\Framework\assertArrayNotHasKey;
-use function PHPUnit\Framework\assertFalse;
-use function PHPUnit\Framework\assertEquals;
-use function PHPUnit\Framework\assertTrue;
 
 final class InitiateResetPasswordTest extends AbstractCidaasTestParent {
     private static $invalidRequestIdResponse = '{"success":false,"status":400,"error":{"code":10001,"moreInfo":"","type":"UsersException","status":400,"referenceNumber":"1603280586488-0eca07a0-5b0e-42e2-95c8-dc9794114968","error":"Invalid request id"}}';
@@ -34,12 +30,12 @@ final class InitiateResetPasswordTest extends AbstractCidaasTestParent {
         })->wait();
 
         $request = $this->mock->getLastRequest();
-        assertEquals('/users-srv/resetpassword/initiate', $request->getUri()->getPath());
+        self::assertEquals('/users-srv/resetpassword/initiate', $request->getUri()->getPath());
         $body = json_decode($request->getBody(), true);
-        assertEquals($_ENV['USERNAME'], $body['email']);
-        assertEquals('CODE', $body['processingType']);
-        assertEquals('email', $body['resetMedium']);
-        assertEquals(self::$REQUEST_ID, $body['requestId']);
+        self::assertEquals($_ENV['USERNAME'], $body['email']);
+        self::assertEquals('CODE', $body['processingType']);
+        self::assertEquals('email', $body['resetMedium']);
+        self::assertEquals(self::$REQUEST_ID, $body['requestId']);
     }
 
     public function test_initiateResetPassword_withValidEmail_returnSuccessResultFromServer() {
@@ -49,10 +45,10 @@ final class InitiateResetPasswordTest extends AbstractCidaasTestParent {
             return $this->provider->initiateResetPassword($_ENV['USERNAME'], $requestId);
         })->wait();
 
-        assertTrue($response['success']);
-        assertEquals(200, $response['status']);
-        assertTrue($response['data']['reset_initiated']);
-        assertEquals(self::$RPRQ, $response['data']['rprq']);
+        self::assertTrue($response['success']);
+        self::assertEquals(200, $response['status']);
+        self::assertTrue($response['data']['reset_initiated']);
+        self::assertEquals(self::$RPRQ, $response['data']['rprq']);
     }
 
     public function test_initiateResetPassword_withInvalidEmail_returnErrorFromServer() {
@@ -62,10 +58,10 @@ final class InitiateResetPasswordTest extends AbstractCidaasTestParent {
             return $this->provider->initiateResetPassword('invalid@widas.de', $requestId);
         })->wait();
         // TODO auf Fehler umstellen, falls das einer sein sollte...falls nicht, Methode löschen
-        assertTrue($response['success']);
-        assertEquals(200, $response['status']);
-        assertTrue($response['data']['reset_initiated']);
-        assertEquals(self::$RPRQ, $response['data']['rprq']);
+        self::assertTrue($response['success']);
+        self::assertEquals(200, $response['status']);
+        self::assertTrue($response['data']['reset_initiated']);
+        self::assertEquals(self::$RPRQ, $response['data']['rprq']);
     }
 
     public function test_initiateResetPassword_withValidEmailAndInvalidRequestId_returnErrorFromServer() {
@@ -79,11 +75,11 @@ final class InitiateResetPasswordTest extends AbstractCidaasTestParent {
             $promise->wait();
             self::fail('Promise should return exception');
         } catch (ClientException $exception) {
-            assertEquals(400, $exception->getCode());
+            self::assertEquals(400, $exception->getCode());
             $response = json_decode($exception->getResponse()->getBody(), true);
-            assertFalse($response['success']);
-            assertEquals(400, $response['status']);
-            assertEquals(10001, $response['error']['code']);
+            self::assertFalse($response['success']);
+            self::assertEquals(400, $response['status']);
+            self::assertEquals(10001, $response['error']['code']);
         }
     }
 }

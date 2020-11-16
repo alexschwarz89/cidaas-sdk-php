@@ -20,13 +20,13 @@
     "openid connect"
   ],
   "require": {
-    "php": "^7.4.0",
-    "guzzlehttp/guzzle": "^7.2.0",
+    "php": "^7.2.9",
+    "guzzlehttp/guzzle": "^6.3.3",
     "ext-json": "*"
   },
   "require-dev": {
     "roave/security-advisories": "dev-master",
-    "phpunit/phpunit": "^9.4.1",
+    "phpunit/phpunit": "^8.5.9",
     "vlucas/phpdotenv": "^5.2"
   },
   "autoload": {

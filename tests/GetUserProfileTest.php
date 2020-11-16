@@ -6,7 +6,6 @@ use Cidaas\OAuth2\Client\Provider\AbstractCidaasTestParent;
 use Cidaas\OAuth2\Client\Provider\GrantType;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Response;
-use function PHPUnit\Framework\assertEquals;
 
 final class GetUserProfileTest extends AbstractCidaasTestParent {
     private static $getAccessTokenInvalidResponse = '{"error":"Access denied for this resource","refnumber":"1603218944318-f1508e83-e50b-477a-af32-747e03d5f1a6"}';
@@ -40,8 +39,8 @@ final class GetUserProfileTest extends AbstractCidaasTestParent {
         })->wait();
 
         $request = $this->mock->getLastRequest();
-        assertEquals('/users-srv/userinfo', $request->getUri()->getPath());
-        assertEquals('Bearer ' . self::$ACCESS_TOKEN, $request->getHeader('Authorization')[0]);
+        self::assertEquals('/users-srv/userinfo', $request->getUri()->getPath());
+        self::assertEquals('Bearer ' . self::$ACCESS_TOKEN, $request->getHeader('Authorization')[0]);
     }
 
     public function test_getUserProfile_withAccessTokenAndSub_serverCalledWithSubAndAccessToken() {
@@ -52,8 +51,8 @@ final class GetUserProfileTest extends AbstractCidaasTestParent {
         })->wait();
 
         $request = $this->mock->getLastRequest();
-        assertEquals('/users-srv/userinfo/' . self::$SUB, $request->getUri()->getPath());
-        assertEquals('Bearer ' . self::$ACCESS_TOKEN, $request->getHeader('Authorization')[0]);
+        self::assertEquals('/users-srv/userinfo/' . self::$SUB, $request->getUri()->getPath());
+        self::assertEquals('Bearer ' . self::$ACCESS_TOKEN, $request->getHeader('Authorization')[0]);
     }
 
     public function test_getUserProfile_withAccessToken_returnsUserProfileFromServer() {
@@ -62,9 +61,9 @@ final class GetUserProfileTest extends AbstractCidaasTestParent {
         $response = $this->responsePromise->then(function ($accessToken) {
             return $this->provider->getUserProfile($accessToken);
         })->wait();
-        assertEquals(self::$SUB, $response['sub']);
-        assertEquals($_ENV['USERNAME'], $response['identities'][0]['email']);
-        assertEquals($_ENV['USERNAME'], $response['email']);
+        self::assertEquals(self::$SUB, $response['sub']);
+        self::assertEquals($_ENV['USERNAME'], $response['identities'][0]['email']);
+        self::assertEquals($_ENV['USERNAME'], $response['email']);
     }
 
     public function test_getUserProfile_withAccessTokenAndInvalidSub_returnsUserProfileFromServer() {
@@ -73,9 +72,9 @@ final class GetUserProfileTest extends AbstractCidaasTestParent {
         $response = $this->responsePromise->then(function ($accessToken) {
             return $this->provider->getUserProfile($accessToken, 'invalidsub');
         })->wait();
-        assertEquals(self::$SUB, $response['sub']);
-        assertEquals($_ENV['USERNAME'], $response['identities'][0]['email']);
-        assertEquals($_ENV['USERNAME'], $response['email']);
+        self::assertEquals(self::$SUB, $response['sub']);
+        self::assertEquals($_ENV['USERNAME'], $response['identities'][0]['email']);
+        self::assertEquals($_ENV['USERNAME'], $response['email']);
     }
 
     public function test_getUserProfile_withInvalidAccessToken_returnsErrorResult() {
@@ -89,9 +88,9 @@ final class GetUserProfileTest extends AbstractCidaasTestParent {
             $promise->wait();
             self::fail('Promise should return exception');
         } catch (ClientException $exception) {
-            assertEquals(401, $exception->getCode());
+            self::assertEquals(401, $exception->getCode());
             $response = json_decode($exception->getResponse()->getBody(), true);
-            assertEquals('Access denied for this resource', $response['error']);
+            self::assertEquals('Access denied for this resource', $response['error']);
         }
     }
 }

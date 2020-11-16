@@ -5,12 +5,6 @@ require_once __DIR__ . '/AbstractCidaasTestParent.php';
 use Cidaas\OAuth2\Client\Provider\AbstractCidaasTestParent;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Response;
-use function PHPUnit\Framework\assertArrayNotHasKey;
-use function PHPUnit\Framework\assertFalse;
-use function PHPUnit\Framework\assertIsArray;
-use function PHPUnit\Framework\assertNull;
-use function PHPUnit\Framework\assertEquals;
-use function PHPUnit\Framework\assertTrue;
 
 final class GetRegistrationSetupTest extends AbstractCidaasTestParent {
     private static $LOCALE = 'de';
@@ -32,8 +26,8 @@ final class GetRegistrationSetupTest extends AbstractCidaasTestParent {
         })->wait();
 
         $uri = $this->mock->getLastRequest()->getUri();
-        assertEquals('/registration-setup-srv/public/list', $uri->getPath());
-        assertEquals('requestId=' . self::$REQUEST_ID . '&acceptlanguage=' . self::$LOCALE, $uri->getQuery());
+        self::assertEquals('/registration-setup-srv/public/list', $uri->getPath());
+        self::assertEquals('requestId=' . self::$REQUEST_ID . '&acceptlanguage=' . self::$LOCALE, $uri->getQuery());
     }
 
     public function test_getRegistrationSetup_withValidRequestId_returnsRegistrationFieldsFromServer() {
@@ -43,9 +37,9 @@ final class GetRegistrationSetupTest extends AbstractCidaasTestParent {
             return $this->provider->getRegistrationSetup($requestId, self::$LOCALE);
         })->wait();
 
-        assertTrue($response['success']);
-        assertEquals(200, $response['status']);
-        assertIsArray($response['data']);
+        self::assertTrue($response['success']);
+        self::assertEquals(200, $response['status']);
+        self::assertIsArray($response['data']);
     }
 
     public function test_getRegistrationSetup_withInvalidRequestId_returnsErrorMessageFromServer() {
@@ -58,12 +52,12 @@ final class GetRegistrationSetupTest extends AbstractCidaasTestParent {
             $promise->wait();
             self::fail('Promise should return exception');
         } catch (ClientException $exception) {
-            assertEquals(400, $exception->getCode());
+            self::assertEquals(400, $exception->getCode());
             $response = json_decode($exception->getResponse()->getBody(), true);
-            assertFalse($response['success']);
-            assertEquals(400, $response['status']);
-            assertEquals(10001, $response['error']['code']);
-            assertArrayNotHasKey('data', $response);
+            self::assertFalse($response['success']);
+            self::assertEquals(400, $response['status']);
+            self::assertEquals(10001, $response['error']['code']);
+            self::assertArrayNotHasKey('data', $response);
         }
     }
 }

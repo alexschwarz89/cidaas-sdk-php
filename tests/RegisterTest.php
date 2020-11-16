@@ -5,12 +5,6 @@ require_once __DIR__ . '/AbstractCidaasTestParent.php';
 use Cidaas\OAuth2\Client\Provider\AbstractCidaasTestParent;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Response;
-use function PHPUnit\Framework\assertFalse;
-use function PHPUnit\Framework\assertIsArray;
-use function PHPUnit\Framework\assertNull;
-use function PHPUnit\Framework\assertEquals;
-use function PHPUnit\Framework\assertTrue;
-use function PHPUnit\Framework\assertArrayNotHasKey;
 
 final class RegisterTest extends AbstractCidaasTestParent {
     private static $registrationSuccessfulResponse = '{"success":true,"status":200,"data":{"q":"f41aa921-abaa-4494-8a8d-d452184c83b9","sub":"f41aa921-abaa-4494-8a8d-d452184c83b9","userStatus":"VERIFIED","email_verified":false,"suggested_redirect_uri":"https://nightlybuild.cidaas.de/user-ui/login?groupname=default&lang=&view_type=login&requestid=7976992b-6417-4461-be1e-3516255c11c4&view_type=login","suggested_action":"MFA","next_token":"eyJhbGciOiJSUzI1NiIsImtpZCI6IjM5NjgzODBkLThjZTItNDIzMS04MzA4LTAyOTE1NmQxN2RkYSJ9.eyJ1YV9oYXNoIjoiZDViNWI4NDJiOGUxOTM4YzIzNDJmMGY5ZTdjMzI0ZWEiLCJzaWQiOiI0MTExZjViYi01NzVjLTRlZWMtOTlhZS0wODhkNjg5MjZhYzkiLCJzdWIiOiJBTk9OWU1PVVMiLCJhdWQiOiI1MjE1NmQ1My0zY2JmLTQzZTctOTZlYi0yNTI4MDNkNGU5Y2EiLCJpYXQiOjE2MDMxOTUxNzksImF1dGhfdGltZSI6MTYwMzE5NTE3OSwiaXNzIjoiaHR0cHM6Ly9uaWdodGx5YnVpbGQuY2lkYWFzLmRlIiwianRpIjoiMTE0OGIzMTctNzUzMy00M2NmLWE3OTEtYjIzMTJhYTIzOWJhIiwic2NvcGVzIjpbXSwiZXhwIjoxNjAzMjgxNTc5fQ.QtvTkzJRSVRreYaQRNlahbWUGrPibawfE473K1CqiO0H3YRF4vo_3_gvjlx1s2gS5cqL-Xu1oCEZaESOBu3O5y8MXGfIRwdQqkXprMYmQcpHf9cyiPsOi8OGmSY0-OTxDqnM8reouEqRS4jobRe5agY2-gL78E9KCdjhLwPfi1Q"}}';
@@ -38,12 +32,12 @@ final class RegisterTest extends AbstractCidaasTestParent {
         })->wait();
 
         $request = $this->mock->getLastRequest();
-        assertEquals('/users-srv/register', $request->getUri()->getPath());
-        assertEquals(self::$REQUEST_ID, $request->getHeader('requestId')[0]);
+        self::assertEquals('/users-srv/register', $request->getUri()->getPath());
+        self::assertEquals(self::$REQUEST_ID, $request->getHeader('requestId')[0]);
         $parsedBody = json_decode($request->getBody(), true);
-        assertEquals('field1', $parsedBody['field1']);
-        assertEquals('field2', $parsedBody['field2']);
-        assertEquals('self', $parsedBody['provider']);
+        self::assertEquals('field1', $parsedBody['field1']);
+        self::assertEquals('field2', $parsedBody['field2']);
+        self::assertEquals('self', $parsedBody['provider']);
     }
 
     public function test_register_withValidRequestIdAndFields_returnsSuccessfulRegistrationFromServer() {
@@ -58,9 +52,9 @@ final class RegisterTest extends AbstractCidaasTestParent {
             ], $requestId);
         })->wait();
 
-        assertTrue($response['success']);
-        assertEquals(200, $response['status']);
-        assertIsArray($response['data']);
+        self::assertTrue($response['success']);
+        self::assertEquals(200, $response['status']);
+        self::assertIsArray($response['data']);
     }
 
     public function test_register_withValidRequestIdAndInvalidFields_returnsInvalidFieldsErrorMessageFromServer() {
@@ -74,12 +68,12 @@ final class RegisterTest extends AbstractCidaasTestParent {
             $promise->wait();
             self::fail('Promise should return exception');
         } catch (ClientException $exception) {
-            assertEquals(417, $exception->getCode());
+            self::assertEquals(417, $exception->getCode());
             $response = json_decode($exception->getResponse()->getBody(), true);
-            assertFalse($response['success']);
-            assertEquals(417, $response['status']);
-            assertEquals(507, $response['error']['code']);
-            assertArrayNotHasKey('data', $response);
+            self::assertFalse($response['success']);
+            self::assertEquals(417, $response['status']);
+            self::assertEquals(507, $response['error']['code']);
+            self::assertArrayNotHasKey('data', $response);
         }
     }
 
@@ -98,12 +92,12 @@ final class RegisterTest extends AbstractCidaasTestParent {
             $promise->wait();
             self::fail('Promise should return exception');
         } catch (ClientException $exception) {
-            assertEquals(400, $exception->getCode());
+            self::assertEquals(400, $exception->getCode());
             $response = json_decode($exception->getResponse()->getBody(), true);
-            assertFalse($response['success']);
-            assertEquals(400, $response['status']);
-            assertEquals(10001, $response['error']['code']);
-            assertArrayNotHasKey('data', $response);
+            self::assertFalse($response['success']);
+            self::assertEquals(400, $response['status']);
+            self::assertEquals(10001, $response['error']['code']);
+            self::assertArrayNotHasKey('data', $response);
         }
     }
 }

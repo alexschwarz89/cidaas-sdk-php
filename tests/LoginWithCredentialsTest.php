@@ -5,11 +5,6 @@ require_once __DIR__ . '/AbstractCidaasTestParent.php';
 use Cidaas\OAuth2\Client\Provider\AbstractCidaasTestParent;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Response;
-use function PHPUnit\Framework\assertArrayNotHasKey;
-use function PHPUnit\Framework\assertFalse;
-use function PHPUnit\Framework\assertNull;
-use function PHPUnit\Framework\assertEquals;
-use function PHPUnit\Framework\assertTrue;
 
 final class LoginWithCredentialsTest extends AbstractCidaasTestParent {
     private static $loginUnsuccessfulWithUnkownUserResponse = '{"success":false,"status":417,"error":{"error":"invalid_username_password","username":"user@widas.de","username_type":"email","error_description":"Given username or password is invalid","view_type":"login","requestId":"bb3b6908-64e4-4ccf-891e-908fc9dd1236","suggested_url":"https://nightlybuild.cidaas.de/user-ui/login?groupname=default&lang=&view_type=login&error=invalid_username_password&username=user%40widas.de&username_type=email&error_description=Given%20username%20or%20password%20is%20invalid&requestId=bb3b6908-64e4-4ccf-891e-908fc9dd1236"}}';
@@ -36,10 +31,10 @@ final class LoginWithCredentialsTest extends AbstractCidaasTestParent {
         $request = $this->mock->getLastRequest();
         $body = json_decode($request->getBody(), true);
 
-        assertEquals($_ENV['USERNAME'], $body['username']);
-        assertEquals($_ENV['PASSWORD'], $body['password']);
-        assertEquals($_ENV['USERNAME_TYPE'], $body['username_type']);
-        assertEquals(self::$REQUEST_ID, $body['requestId']);
+        self::assertEquals($_ENV['USERNAME'], $body['username']);
+        self::assertEquals($_ENV['PASSWORD'], $body['password']);
+        self::assertEquals($_ENV['USERNAME_TYPE'], $body['username_type']);
+        self::assertEquals(self::$REQUEST_ID, $body['requestId']);
     }
 
     public function test_loginWithCredentials_withValidCredentialsGiven_returnsLoginSuccessfulFromServer() {
@@ -50,9 +45,9 @@ final class LoginWithCredentialsTest extends AbstractCidaasTestParent {
         });
 
         $response = $promise->wait();
-        assertTrue($response['success']);
-        assertEquals(200, $response['status']);
-        assertEquals(self::$CODE, $response['data']['code']);
+        self::assertTrue($response['success']);
+        self::assertEquals(200, $response['status']);
+        self::assertEquals(self::$CODE, $response['data']['code']);
     }
 
     public function test_loginWithCredentials_withInvalidCredentialsAndKnownUsernameGiven_returnsLoginUnsuccessfulFromServer() {
@@ -66,13 +61,13 @@ final class LoginWithCredentialsTest extends AbstractCidaasTestParent {
             $promise->wait();
             self::fail('Promise should return exception');
         } catch (ClientException $exception) {
-            assertEquals(417, $exception->getCode());
+            self::assertEquals(417, $exception->getCode());
             $response = json_decode($exception->getResponse()->getBody(), true);
-            assertFalse($response['success']);
-            assertEquals(417, $response['status']);
-            assertArrayNotHasKey('data', $response);
-            assertEquals(self::$SUB, $response['error']['sub']);
-            assertEquals('invalid_username_password', $response['error']['error']);
+            self::assertFalse($response['success']);
+            self::assertEquals(417, $response['status']);
+            self::assertArrayNotHasKey('data', $response);
+            self::assertEquals(self::$SUB, $response['error']['sub']);
+            self::assertEquals('invalid_username_password', $response['error']['error']);
         }
     }
 
@@ -87,13 +82,13 @@ final class LoginWithCredentialsTest extends AbstractCidaasTestParent {
             $promise->wait();
             self::fail('Promise should return exception');
         } catch (ClientException $exception) {
-            assertEquals(417, $exception->getCode());
+            self::assertEquals(417, $exception->getCode());
             $response = json_decode($exception->getResponse()->getBody(), true);
-            assertFalse($response['success']);
-            assertEquals(417, $response['status']);
-            assertArrayNotHasKey('data', $response);
-            assertEquals('invalid_username_password', $response['error']['error']);
-            assertArrayNotHasKey('login', $response['error']);
+            self::assertFalse($response['success']);
+            self::assertEquals(417, $response['status']);
+            self::assertArrayNotHasKey('data', $response);
+            self::assertEquals('invalid_username_password', $response['error']['error']);
+            self::assertArrayNotHasKey('login', $response['error']);
         }
     }
 }
