@@ -23,6 +23,7 @@ class Cidaas {
     private static $initiateResetPasswordUri = '/users-srv/resetpassword/initiate';
     private static $handleResetPasswordUri = '/users-srv/resetpassword/validatecode';
     private static $resetPasswordUri = '/users-srv/resetpassword/accept';
+    private static $addOrUpdateGroupMapUri = '/groups-srv/usergroupmap/assign';
 
     private $openid_config;
     private $baseUrl = "";
@@ -322,6 +323,43 @@ class Cidaas {
         return $responsePromise->then(function (ResponseInterface $response) {
             $body = $response->getBody();
 
+            return $this->parseJson($body);
+        });
+    }
+
+    /**
+     * Adds or update groups and roles for given sub
+     * @param string $sub
+     * @param string $groupId
+     * @param array|null $roles
+     * @param string $accessToken
+     * @return PromiseInterface
+     */
+    public function addOrUpdateGroupMap(string $sub, string $groupId, ?array $roles, string $accessToken): PromiseInterface {
+
+        $client = $this->createClient();
+
+        $payload = [
+            'sub' => $sub,
+            'groupId' => $groupId,
+            'roles' => $roles ?? []
+        ];
+
+        $postBody = json_encode($payload, JSON_UNESCAPED_SLASHES);
+
+        $options = [
+            RequestOptions::BODY => $postBody,
+            RequestOptions::HEADERS => [
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Bearer ' . $accessToken
+            ]
+        ];
+        $url = $this->baseUrl . self::$addOrUpdateGroupMapUri;
+
+        $responsePromise = $client->requestAsync('POST', $url, $options);
+
+        return $responsePromise->then(function (ResponseInterface $response) {
+            $body = $response->getBody();
             return $this->parseJson($body);
         });
     }
