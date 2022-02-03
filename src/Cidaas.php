@@ -23,7 +23,10 @@ class Cidaas {
     private static $initiateResetPasswordUri = '/users-srv/resetpassword/initiate';
     private static $handleResetPasswordUri = '/users-srv/resetpassword/validatecode';
     private static $resetPasswordUri = '/users-srv/resetpassword/accept';
+
+
     private static $addOrUpdateGroupMapUri = '/groups-srv/usergroupmap/assign';
+    private static $crudProfileUriPrefix = '/users-srv/user/';
 
     private $openid_config;
     private $baseUrl = "";
@@ -479,6 +482,35 @@ class Cidaas {
             ]
         ];
         $url = $this->baseUrl . self::$updateProfileUriPrefix . $sub;
+
+        $responsePromise = $client->requestAsync('PUT', $url, $options);
+        return $responsePromise->then(function (ResponseInterface $response) {
+            $body = $response->getBody();
+            return $this->parseJson($body);
+        });
+    }
+
+    /**
+     * Update user profile.
+     * @param string $sub of profile to be updated
+     * @param array $fields to update
+     * @param string $accessToken for api access
+     * @param string $provider of identity profile
+     * @return PromiseInterface promise with success or error message
+     */
+    public function crudProfile(string $sub, array $fields, string $accessToken, string $provider = 'self'): PromiseInterface {
+        $client = $this->createClient();
+
+        $fields['provider'] = $provider;
+        $postBody = json_encode($fields, JSON_UNESCAPED_SLASHES);
+        $options = [
+            RequestOptions::BODY => $postBody,
+            RequestOptions::HEADERS => [
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Bearer ' . $accessToken
+            ]
+        ];
+        $url = $this->baseUrl . self::$crudProfileUriPrefix . $sub;
 
         $responsePromise = $client->requestAsync('PUT', $url, $options);
         return $responsePromise->then(function (ResponseInterface $response) {
