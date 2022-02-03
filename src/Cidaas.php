@@ -36,6 +36,9 @@ class Cidaas {
     private $handler;
     private $debug = false;
 
+    const ACCESS_MODE_SELF_SERVICE = 'self';
+    const ACCESS_MODE_ADMINISTRATIVE = 'administrative';
+
     /**
      * Cidaas constructor.
      * @param string $baseUrl of cidaas server
@@ -462,7 +465,8 @@ class Cidaas {
     }
 
     /**
-     * Update user profile.
+     * Update user profile (self-service)
+     *
      * @param string $sub of profile to be updated
      * @param array $fields to update
      * @param string $accessToken for api access
@@ -470,24 +474,20 @@ class Cidaas {
      * @return PromiseInterface promise with success or error message
      */
     public function updateProfile(string $sub, array $fields, string $accessToken, string $provider = 'self'): PromiseInterface {
-        $client = $this->createClient();
+       return $this->crudProfile(self::ACCESS_MODE_SELF_SERVICE, $sub, $fields, $accessToken, $provider);
+    }
 
-        $fields['provider'] = $provider;
-        $postBody = json_encode($fields, JSON_UNESCAPED_SLASHES);
-        $options = [
-            RequestOptions::BODY => $postBody,
-            RequestOptions::HEADERS => [
-                'Content-Type' => 'application/json',
-                'Authorization' => 'Bearer ' . $accessToken
-            ]
-        ];
-        $url = $this->baseUrl . self::$updateProfileUriPrefix . $sub;
-
-        $responsePromise = $client->requestAsync('PUT', $url, $options);
-        return $responsePromise->then(function (ResponseInterface $response) {
-            $body = $response->getBody();
-            return $this->parseJson($body);
-        });
+    /**
+     * Update user (CRUD)
+     *
+     * @param string $sub of profile to be updated
+     * @param array $fields to update
+     * @param string $accessToken for api access
+     * @param string $provider of identity profile
+     * @return PromiseInterface promise with success or error message
+     */
+    public function updateUser(string $sub, array $fields, string $accessToken, string $provider = 'self'): PromiseInterface {
+        return $this->crudProfile(self::ACCESS_MODE_ADMINISTRATIVE, $sub, $fields, $accessToken, $provider);
     }
 
     /**
@@ -498,7 +498,7 @@ class Cidaas {
      * @param string $provider of identity profile
      * @return PromiseInterface promise with success or error message
      */
-    public function crudProfile(string $sub, array $fields, string $accessToken, string $provider = 'self'): PromiseInterface {
+    protected function crudProfile(string $accessMode, string $sub, array $fields, string $accessToken, string $provider = 'self'): PromiseInterface {
         $client = $this->createClient();
 
         $fields['provider'] = $provider;
@@ -510,7 +510,12 @@ class Cidaas {
                 'Authorization' => 'Bearer ' . $accessToken
             ]
         ];
-        $url = $this->baseUrl . self::$crudProfileUriPrefix . $sub;
+
+        $url = $this->baseUrl . self::$updateProfileUriPrefix . $sub;
+
+        if ($accessMode === self::ACCESS_MODE_ADMINISTRATIVE) {
+            $url = $this->baseUrl . self::$crudProfileUriPrefix . $sub;
+        }
 
         $responsePromise = $client->requestAsync('PUT', $url, $options);
         return $responsePromise->then(function (ResponseInterface $response) {
