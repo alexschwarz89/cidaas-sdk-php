@@ -474,7 +474,7 @@ class Cidaas {
      * @return PromiseInterface promise with success or error message
      */
     public function updateProfile(string $sub, array $fields, string $accessToken, string $provider = 'self'): PromiseInterface {
-       return $this->crudProfile(self::ACCESS_MODE_SELF_SERVICE, $sub, $fields, $accessToken, $provider);
+        return $this->crudProfile(self::ACCESS_MODE_SELF_SERVICE, $sub, $fields, $accessToken, $provider);
     }
 
     /**
